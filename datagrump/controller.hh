@@ -2,8 +2,16 @@
 #define CONTROLLER_HH
 
 #include <cstdint>
-
+#include <list>
 /* Congestion controller interface */
+
+struct Packet{
+  const uint64_t seq;
+  const uint64_t time;
+
+  Packet(uint64_t seq_, uint64_t time_) :
+    seq(seq_), time(time_) {}
+};
 
 class Controller
 {
@@ -12,6 +20,8 @@ private:
 
   /* Add member variables here */
   unsigned int curr_window_size = 1;
+  std::list<Packet> list;
+  int acks = 0;
 
 public:
   /* Public interface for the congestion controller */
