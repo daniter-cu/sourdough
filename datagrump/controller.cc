@@ -32,7 +32,7 @@ void Controller::datagram_was_sent( const uint64_t sequence_number,
 {
   /* Default: take no action */
 
-  if(list.size() > 0 && send_timestamp - list.front().time > 100){
+  if(list.size() > 0 && send_timestamp - list.front().time > 80){
     curr_window_size = 1;
   }
 
@@ -66,7 +66,7 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
   }
   /* Default: take no action */
   acks++;
-  if(acks > 1){
+  if(acks > 2){
     curr_window_size += 1;
     acks = 0;
   }
