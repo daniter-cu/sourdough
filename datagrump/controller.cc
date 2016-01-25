@@ -2,7 +2,7 @@
 
 #include "controller.hh"
 #include "timestamp.hh"
-
+#include <algorithm>
 using namespace std;
 
 /* Default constructor */
@@ -14,14 +14,14 @@ Controller::Controller( const bool debug )
 unsigned int Controller::window_size( void )
 {
   /* Default: fixed window size of 100 outstanding datagrams */
-  unsigned int the_window_size = 50;
+  unsigned int max_window_size = 50;
 
   if ( debug_ ) {
     cerr << "At time " << timestamp_ms()
-	 << " window size is " << the_window_size << endl;
+	 << " window size is " << curr_window_size << endl;
   }
 
-  return the_window_size;
+  return std::min(curr_window_size, max_window_size);
 }
 
 /* A datagram was sent */
@@ -49,6 +49,11 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
                                /* when the ack was received (by sender) */
 {
   /* Default: take no action */
+  if ( (timestamp_ack_received - send_timestamp_acked) > 80){
+    curr_window_size = 1;
+  } else {
+    curr_window_size += 1;
+  }
 
   if ( debug_ ) {
     cerr << "At time " << timestamp_ack_received
@@ -63,5 +68,8 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
    before sending one more datagram */
 unsigned int Controller::timeout_ms( void )
 {
-  return 1000; /* timeout of one second */
+  return 100; /* timeout of one second */
+}
+
+void Controller::timeout_hit( void) {
 }
