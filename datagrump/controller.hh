@@ -19,7 +19,7 @@ private:
   bool debug_; /* Enables debugging output */
 
   /* Add member variables here */
-  unsigned int curr_window_size = 1;
+  unsigned int curr_window_size = 25;
   std::list<Packet> list;
   int acks = 0;
 

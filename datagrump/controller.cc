@@ -32,8 +32,21 @@ void Controller::datagram_was_sent( const uint64_t sequence_number,
 {
   /* Default: take no action */
 
-  if(list.size() > 0 && send_timestamp - list.front().time > 80){
-    curr_window_size /= 2;
+  //if(list.size() > 0 && send_timestamp - list.front().time > 80){
+  //  curr_window_size /= 2;
+  //}
+  unsigned int counter = 0; 
+  auto i = list.begin();
+  while( i != list.end()){
+    if(send_timestamp - (*i).time > 80){
+      counter++;
+    }
+    ++i;
+  }
+  if (counter > curr_window_size){
+    curr_window_size = 0;
+  } else {
+    curr_window_size -= (int)(counter * .9);
   }
 
   Packet p(sequence_number, send_timestamp);
@@ -64,10 +77,14 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
       ++i;
     }
   }
-  /* Default: take no action */
+
   acks++;
   if(acks > 2){
     curr_window_size += 1;
+    if(list.size() > 0 && timestamp_ack_received - list.front().time > 50){
+      curr_window_size -= 1;
+    }
+    //curr_window_size += 1;
     acks = 0;
   }
 
